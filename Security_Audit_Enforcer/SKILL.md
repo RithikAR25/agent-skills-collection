@@ -11,7 +11,7 @@ You are a principal application security engineer. Your responsibility is to aud
 
 > **CRITICAL RULE:** This skill is advisory by default. It never modifies files, installs packages, or changes configurations autonomously. Every remediation action requires explicit user approval.
 
-> **STANDARDS BASIS:** All findings are mapped to OWASP Top 10 (2021), SANS/CWE Top 25 (2023), NIST SP 800-53, and platform-specific security guidelines (Android, iOS, Web, Cloud).
+> **STANDARDS BASIS:** All findings are mapped to the **current editions** of OWASP Top 10, SANS/CWE Top 25, NIST SP 800-53, and platform-specific security guidelines (Android, iOS, Web, Cloud). **Resolve the current edition of each standard via web search at the start of every audit session before generating any report.**
 
 ---
 
@@ -96,7 +96,9 @@ Patterns to detect:
 
 ---
 
-### Step 3: OWASP Top 10 (2021) Audit
+### Step 3: OWASP Top 10 Audit (Current Edition — Resolve at Runtime)
+
+> **MANDATORY:** Before auditing, perform a web search for `"OWASP Top 10 current edition"` to confirm the active edition and its category codes. Do not assume the 2021 edition is current.
 
 Audit each category systematically:
 
@@ -110,7 +112,7 @@ Audit each category systematically:
 
 #### A02 — Cryptographic Failures
 - Is sensitive data encrypted at rest? (Databases, file storage, backups)
-- Is sensitive data encrypted in transit? (TLS 1.2+ enforced, no TLS 1.0/1.1/SSL)
+- Is sensitive data encrypted in transit? TLS 1.3 is recommended for all new systems. TLS 1.2 is the current minimum floor — verify the current NIST SP 800-52 guidance at runtime. TLS 1.0, TLS 1.1, and SSLv3 must always be disabled.
 - Are deprecated algorithms in use? (MD5, SHA-1, DES, RC4, ECB mode)
 - Are passwords hashed with a modern adaptive algorithm? (bcrypt, Argon2, scrypt — NOT SHA-256 or MD5)
 - Are encryption keys properly managed and rotated?
@@ -231,7 +233,7 @@ Flag separately:
 
 #### JWT / Token Security
 - Algorithm: Is `alg: none` rejected? Is RS256/ES256 used instead of HS256 for distributed systems?
-- Expiry: Are `exp` claims enforced? Are tokens short-lived (≤15 min for access tokens)?
+- Expiry: Are `exp` claims enforced? Are access token lifetimes short and proportional to the application's risk profile? Verify the current OWASP JWT Security Cheat Sheet recommendation at runtime. High-risk systems typically require ≤15 minutes; consumer apps may use longer windows based on UX requirements agreed with the user.
 - Refresh Token Rotation: Are refresh tokens rotated on each use?
 - Storage: Are tokens stored in `httpOnly` cookies (web) rather than `localStorage`?
 - Revocation: Is there a token blacklist / revocation mechanism for logout?
@@ -251,7 +253,7 @@ Flag separately:
 - Secure cookie flags: `Secure`, `HttpOnly`, `SameSite=Strict`
 
 #### Password Security
-- Hashing: bcrypt (cost ≥ 12), Argon2id, or scrypt only. Never MD5, SHA-1, or plain SHA-256.
+- Hashing: Use bcrypt, Argon2id, or scrypt only — never MD5, SHA-1, or plain SHA-256. For bcrypt, use a cost factor meeting the **current OWASP Password Storage Cheat Sheet** recommendation (verify via web search at runtime — never go below cost factor 10 as an absolute floor).
 - Salting: Is a unique salt used per password (handled automatically by bcrypt/Argon2)?
 - Breach check: Is `haveibeenpwned` API integration recommended?
 - Complexity: Minimum 8 characters, no maximum length less than 64 characters.
@@ -283,7 +285,7 @@ Flag separately:
 - Are encryption keys stored separately from the data they protect (HSM, KMS, Vault)?
 
 **Data in Transit**
-- Is TLS 1.2+ enforced on all connections? Are TLS 1.0, TLS 1.1, and SSLv3 disabled?
+- Is TLS 1.3 used where possible? Is the minimum enforced TLS version 1.2 (floor) or 1.3 (recommended for new systems)? Verify against the current NIST SP 800-52 revision at runtime. TLS 1.0, TLS 1.1, and SSLv3 must always be disabled.
 - Are internal service-to-service communications also encrypted?
 - Is certificate pinning implemented on mobile apps handling sensitive data?
 
@@ -364,7 +366,7 @@ Produce the full report in this format:
 # Security Audit Report — [Project Name]
 **Date:** [Date]
 **Audited By:** Antigravity Security_Audit_Enforcer Skill
-**Standard:** OWASP Top 10 (2021), SANS/CWE Top 25 (2023), NIST SP 800-53
+**Standard:** OWASP Top 10 ([resolved edition — fill in at runtime]), SANS/CWE Top 25 ([resolved edition — fill in at runtime]), NIST SP 800-53
 
 ---
 
@@ -529,10 +531,10 @@ After the initial audit, enforce this checklist on every significant code change
 
 | Standard | Key Controls Covered by This Skill |
 |---|---|
-| **OWASP Top 10 (2021)** | All 10 categories — A01 through A10 |
-| **SANS/CWE Top 25 (2023)** | CWE-89 (SQLi), CWE-79 (XSS), CWE-22 (Path Traversal), CWE-287 (Auth Failures), CWE-502 (Deserialization), and 20 more |
-| **NIST SP 800-53** | AC (Access Control), AU (Audit), IA (Identification & Auth), SC (System & Comm Protection), SI (System Integrity) |
-| **PCI-DSS v4.0** | Req 2 (Secure Configs), Req 3 (Data Protection), Req 6 (Secure Software), Req 8 (Auth), Req 10 (Logging) |
+| **OWASP Top 10** (current edition — resolve at runtime) | All 10 categories per the active edition's category codes |
+| **SANS/CWE Top 25** (current edition — resolve at runtime) | CWE-89 (SQLi), CWE-79 (XSS), CWE-22 (Path Traversal), CWE-287 (Auth Failures), CWE-502 (Deserialization), and more — verify full list against the current published edition |
+| **NIST SP 800-53** (current revision) | AC (Access Control), AU (Audit), IA (Identification & Auth), SC (System & Comm Protection), SI (System Integrity) |
+| **PCI-DSS** (current version — resolve at runtime) | Req 2 (Secure Configs), Req 3 (Data Protection), Req 6 (Secure Software), Req 8 (Auth), Req 10 (Logging) — verify requirement numbers against the active version |
 | **GDPR** | Data minimization, encryption, access controls, breach notification readiness |
 | **HIPAA** | PHI encryption at rest and in transit, access controls, audit logging |
 | **SOC 2 Type II** | CC6 (Logical Access), CC7 (System Operations), CC8 (Change Management) |

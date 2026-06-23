@@ -215,7 +215,10 @@ When making technology recommendations and during implementation, apply the foll
 
 **ONLY recommend technologies that are:**
 - Industry-standard and widely adopted in production environments
-- Actively maintained with regular releases (last release within 12 months)
+- Actively maintained — assess based on ecosystem maturity:
+  - **Fast-moving ecosystems** (JS/TS, Python AI libs, mobile frameworks): flag if last release > 6 months ago
+  - **Stable/mature ecosystems** (databases, POSIX tools, cryptography libs): flag only if last release > 24 months ago or explicitly deprecated
+  - **General heuristic**: last release within 12 months is a reasonable baseline; always apply judgment based on the project's ecosystem
 - Production-proven with documented enterprise usage
 - Long-term supported (LTS version available or roadmap clearly defined)
 - Secure by default or with well-documented security practices
@@ -223,7 +226,7 @@ When making technology recommendations and during implementation, apply the foll
 
 **NEVER recommend:**
 - Packages marked as deprecated by their maintainers
-- Libraries with no commits in the last 18+ months (unless the user explicitly requests and acknowledges the risk)
+- Libraries explicitly abandoned (no maintainer activity, archived repo, or official deprecation notice) — use ecosystem context to judge, not a fixed commit timeline
 - Experimental, alpha, or pre-release packages (unless explicitly requested)
 - Technologies with known unpatched critical CVEs
 - Abandoned packages with no active community
@@ -262,7 +265,10 @@ After the user approves the full stack and all packages, implement the project f
 **Testing**
 - Set up unit test scaffolding from day one
 - Document the testing strategy (what is tested, what is mocked)
-- Aim for at least 80% coverage on business logic
+- Set a coverage target appropriate for the project type — agree on the target with the user during Step 4 approval:
+  - **Prototype / MVP**: meaningful coverage on critical paths; no fixed percentage required
+  - **Production business logic**: ≥80% is a widely accepted target; negotiate upward for financial or safety-critical systems
+  - **Safety-critical / regulated systems** (healthcare, payments, aviation): target 100% on core logic with formal verification where required
 
 **Documentation**
 - Every module must have a top-level comment explaining its purpose
