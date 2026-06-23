@@ -266,7 +266,7 @@ Generate professional repository name suggestions following these rules:
 
 Generate two levels of description:
 
-**Short Description** (for GitHub/GitLab "About" field — 1 line, max 150 characters):
+**Short Description** (for GitHub/GitLab "About" field — 1 line, max 350 characters):
 
 ```
 [One-sentence summary of what the project does and who it's for]
